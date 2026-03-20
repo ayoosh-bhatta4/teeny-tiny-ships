@@ -2,7 +2,7 @@ import requests
 usr_list = []
 while(True):
     usr_in = input("Enter items of your list, type DONE to exit: ")
-    if(usr_in == "DONE"): break;
+    if(usr_in.lower() == "done"): break;
     usr_list.append(usr_in)
 in_str = " ".join(usr_list)
 
@@ -14,15 +14,23 @@ prompt = f'''INSTRUCTION: You are a system that will be given a list of items fo
             OUTPUT:'''
 
 
-
-response = requests.post(
-    "http://localhost:11434/api/generate",
-    json = {
-        "model" : "phi",
-        "prompt": prompt,
-        "stream": False
-    }
-)
+try:
+    response = requests.post(
+        "http://localhost:11434/api/generate",
+        json = {
+            "model" : "phi",
+            "prompt": prompt,
+            "stream": False
+        }
+    )
+except requests.exceptions.ConnectionError:
+    print("Ollama not working")
+except requests.exceptions.ConnectTimeout:
+    print("Ollama connection timeout")
+except requests.exceptions.InvalidURL:
+    print("Wrong url")
+except Exception as e:
+    print("Unknown error when getting response from ollama")
 
 data = response.json()
 output = data["response"]
