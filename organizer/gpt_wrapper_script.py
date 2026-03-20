@@ -1,4 +1,6 @@
 import requests
+import json
+# getting user input list
 usr_list = []
 while(True):
     usr_in = input("Enter items of your list, type DONE to exit: ")
@@ -6,33 +8,83 @@ while(True):
     usr_list.append(usr_in)
 in_str = " ".join(usr_list)
 
-prompt = f'''INSTRUCTION: You are a system that will be given a list of items followed by their price. currency is rupees if not mentioned. your job is to replace the specific names of the items by their more generic category. For example, Uber beccomes transport. Swiggy becomes food and so on. If there are things which are in the same category, add up their prices. Only output the result. No explanantion. Output EXACTLY in this format: <category> <number> no extra words. 
-            EXAMPLE: if input is "swiggy 120 coffee 100 uber 300", you output
-                food 220
-                transport 300
-            INPUT: {in_str}
-            OUTPUT:'''
+prompt = f'''
+TASK:
+Convert input into category totals.
+
+RULES:
+- Output ONLY valid JSON
+- No explanation
+- No extra text
+- Keys must be category names (strings)
+- Values must be integers
+- Sum values of same category
+
+EXAMPLE:
+Input: swiggy 120 coffee 100 uber 300
+Output:
+{{"food": 220, "transport": 300}}
+
+INPUT:
+{in_str}
+
+OUTPUT:
+'''
 
 
-try:
-    response = requests.post(
-        "http://localhost:11434/api/generate",
-        json = {
-            "model" : "phi",
-            "prompt": prompt,
-            "stream": False
-        }
-    )
-except requests.exceptions.ConnectionError:
-    print("Ollama not working")
-except requests.exceptions.ConnectTimeout:
-    print("Ollama connection timeout")
-except requests.exceptions.InvalidURL:
-    print("Wrong url")
-except Exception as e:
-    print("Unknown error when getting response from ollama")
+import json
 
-data = response.json()
-output = data["response"]
+MAX_RETRIES = 7
+success = False
 
-print(output)
+for attempt in range(MAX_RETRIES):
+    try:
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={
+                "model": "phi",
+                "prompt": prompt,
+                "stream": False
+            },
+            timeout=5
+        )
+
+        response.raise_for_status()
+
+        data = response.json()
+        raw_output = data["response"].strip()
+
+        # extract JSON part
+        start = raw_output.find("{")
+        end = raw_output.rfind("}") + 1
+
+        if start == -1 or end == -1:
+            raise InvalidOutputError("No JSON found")
+
+        json_str = raw_output[start:end]
+        parsed = json.loads(json_str)
+
+        # validate structure
+        for key, value in parsed.items():
+            if not isinstance(key, str):
+                raise InvalidOutputError("Invalid key type")
+            if not isinstance(value, int):
+                raise InvalidOutputError("Invalid value type")
+
+        # success
+        success = True
+        break
+
+    except (requests.exceptions.RequestException,
+            json.JSONDecodeError,
+            KeyError,
+            InvalidOutputError) as e:
+
+        print(f"Attempt {attempt+1} failed:", e)
+
+# after loop
+if not success:
+    print("Failed after all retries")
+    exit()
+
+print(parsed)
