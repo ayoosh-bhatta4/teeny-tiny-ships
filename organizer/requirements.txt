@@ -1,5 +1,19 @@
+# --- Environment & Jupyter ---
+python-dotenv
+ipykernel
+
+# --- Data Generation & Manipulation ---
 groq
-transformers
+pandas
+numpy
+
+# --- Model Training & Hub ---
+transformers[torch]
 datasets
 huggingface_hub
-pandas
+accelerate
+evaluate
+scikit-learn
+
+# --- Web UI ---
+gradio
