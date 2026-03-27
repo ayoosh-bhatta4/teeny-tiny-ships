@@ -1,0 +1,42 @@
+[
+    {
+        "test_name": "Generalization - Missing Amounts V2",
+        "input": "laptop 1200 mouse keyboard 50",
+        "expected_sum": 1250
+    },
+    {
+        "test_name": "Generalization - Conversational Story",
+        "input": "Paid the plumber 350 to fix the sink and bought a new faucet for 120.",
+        "expected_sum": 470
+    },
+    {
+        "test_name": "Generalization - Chaotic Formatting",
+        "input": "   sNeAkErS    150   hOoDiE 60  ",
+        "expected_sum": 210
+    },
+    {
+        "test_name": "Generalization - Heavy Punctuation",
+        "input": "[water_bill]: 45 | (internet_plan) - 60",
+        "expected_sum": 105
+    },
+    {
+        "test_name": "Stress Test - Sci-Fi Nonsense",
+        "input": "flux_capacitor 5000 kyber_crystal 2000",
+        "expected_sum": 7000
+    },
+    {
+        "test_name": "Stress Test - High Volume Hardware",
+        "input": "hammer 15 nails 5 drill 80 screws 10 tape 4 paint 30 brushes 12 tarp 8",
+        "expected_sum": 164
+    },
+    {
+        "test_name": "Generalization - Long Multi-Word Descriptions",
+        "input": "electric bill for january 120 weekend getaway to the mountains 400 fancy dinner date 80",
+        "expected_sum": 600
+    },
+    {
+        "test_name": "Edge Case - Number-like Words (Tricky!)",
+        "input": "four tickets to the game 200 one dozen donuts 15",
+        "expected_sum": 215
+    }
+]
