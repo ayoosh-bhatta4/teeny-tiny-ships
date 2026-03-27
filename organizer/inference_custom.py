@@ -14,7 +14,7 @@ from transformers import pipeline
 load_dotenv()
 
 # 1. Initialize the pipeline ONCE when the script loads
-MODEL_ID = "ayoosh-bhatta4/teeny-finance-classifier" # Change if your HF repo is named differently
+MODEL_ID = "panchoaa/Organizer_DistilliBERT_model_custom" # Change if your HF repo is named differently
 print(f"Loading custom model '{MODEL_ID}' from Hugging Face...")
 
 expense_classifier = pipeline(
